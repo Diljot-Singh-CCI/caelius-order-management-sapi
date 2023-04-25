@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd ">
+    <flow name="caelius-order-management-sapi-main">
+        <http:listener config-ref="caelius-order-management-sapi-httpListenerConfig" path="/api/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <ee:transform doc:name="var : correlationId" doc:id="e291b585-ebdf-491f-b4b9-a499bc5fee33">
+            <ee:message />
+            <ee:variables>
+                <ee:set-variable variableName="correlationId"><![CDATA[%dw 2.0
+output application/java
+---
+attributes.headers.correlationId default correlationId]]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <apikit:router config-ref="caelius-order-management-sapi-config" />
+        <error-handler ref="common-error-handler" />
+    </flow>
+    <flow name="caelius-order-management-sapi-console">
+        <http:listener config-ref="caelius-order-management-sapi-httpListenerConfig" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="caelius-order-management-sapi-config" />
+        <error-handler ref="common-error-handler" />
+    </flow>
+    <flow name="get:\customer:caelius-order-management-sapi-config">
+        <flow-ref doc:name="get-customer-data-sub-flow" doc:id="55602666-08cb-415d-8fc4-002e73773273" name="get-customer-data-sub-flow" />
+    </flow>
+    <flow name="get:\item:caelius-order-management-sapi-config">
+        <flow-ref doc:name="get-items-data-sub-flow" doc:id="275d2b0b-bc06-48a2-bed6-cefd47a2c5ce" name="get-items-data-sub-flow" />
+    </flow>
+    <flow name="get:\order:caelius-order-management-sapi-config">
+        <flow-ref doc:name="get-order-data-sub-flow" doc:id="6ff87410-541f-4b2b-9a62-819f896c2aaf" name="get-order-data-sub-flow" />
+    </flow>
+    <flow name="post:\customer:application\json:caelius-order-management-sapi-config">
+        <flow-ref doc:name="post-customer-data-sub-flow" doc:id="64aa4178-9095-437a-a6ba-91e2e264e493" name="post-customer-data-sub-flow" />
+    </flow>
+    <flow name="post:\item:application\json:caelius-order-management-sapi-config">
+        <flow-ref doc:name="post-items-data-sub-flow" doc:id="aeffc84f-9127-4b56-abb4-602076d1f24c" name="post-items-data-sub-flow" />
+    </flow>
+    <flow name="post:\order:application\json:caelius-order-management-sapi-config">
+        <flow-ref doc:name="post-order-data-sub-flow" doc:id="f3078c7e-9d1c-4440-acb8-fb9823bdb003" name="post-order-data-sub-flow" />
+    </flow>
+</mule>

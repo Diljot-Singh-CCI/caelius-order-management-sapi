@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd">
+	<sub-flow name="post-items-data-sub-flow" doc:id="5e930416-088d-48f0-89a1-7256781f171d" >
+		<logger level="INFO" doc:name="Start" doc:id="a1a1fe11-77bc-4ec5-ae46-977d538143a2" />
+		<ee:transform doc:name="Transform Message" doc:id="d43f9f0d-863c-4949-bd19-09c887734a57" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+[{
+	Order__c: payload.orderId,
+	quantity__c: payload.quantity,
+	size__c: payload.size,
+	id__c: payload.id,
+	category__c: payload.category
+}]]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<salesforce:create type="item__c" doc:name="Create item (item__c)" doc:id="f3720c41-3271-4d19-a298-e486879755df" config-ref="Salesforce_Config"/>
+		<ee:transform doc:name="Transform Message" doc:id="d8ccfc3a-214f-4ea4-b652-14dbc9d22e5b" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="End" doc:id="95b04423-e061-448d-ade7-076ea3a04d08" />
+	</sub-flow>
+</mule>

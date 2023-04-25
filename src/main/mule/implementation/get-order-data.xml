@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd">
+	<sub-flow name="get-order-data-sub-flow" doc:id="2ae2b375-c3db-4ea6-a018-49441f1b5046" >
+		<logger level="INFO" doc:name="Start" doc:id="e288b9cd-9ee6-458f-a742-0a87dee30ef1" />
+		<ee:transform doc:name="preparing  SOQL query" doc:id="cd4e2b38-f3a7-4a56-8ee6-c81cc0762021" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="SOQLquery" ><![CDATA["Select Fields(all) from order__c where poNumber__c = " ++ attributes.queryParams.poNumber ++ " limit 200"]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<salesforce:query doc:name="order__c " doc:id="67934fdf-c301-438e-aa39-241310575280" config-ref="Salesforce_Config">
+			<salesforce:salesforce-query ><![CDATA[#[vars.SOQLquery]]]></salesforce:salesforce-query>
+		
+</salesforce:query>
+		<ee:transform doc:name="payload" doc:id="0ec01088-ef43-4bc0-8ce9-5a67c863496a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="End" doc:id="44f96daa-ddf5-4004-908e-f5c66779d7b3" />
+	</sub-flow>
+</mule>

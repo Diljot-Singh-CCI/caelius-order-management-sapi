@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="get-customer-data-sub-flow" doc:id="d6aa69b7-14a2-426f-b273-b49976d44b40" >
+		<logger level="INFO" doc:name="Start" doc:id="eec7c6a0-6a3e-44ee-9b14-958728e47f78" />
+		<salesforce:query doc:name="Get customer__c " doc:id="b757a5f1-147d-4009-bf32-1aaa854619eb" config-ref="Salesforce_Config">
+			<salesforce:salesforce-query ><![CDATA[Select Fields(all) from customer__c limit 200]]></salesforce:salesforce-query>
+		</salesforce:query>
+		<ee:transform doc:name="payload" doc:id="8da86dcd-db11-4609-8767-e8308f6aa6d9" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="End" doc:id="e536552e-e260-4a30-b061-8329401a6916" />
+	</sub-flow>
+</mule>

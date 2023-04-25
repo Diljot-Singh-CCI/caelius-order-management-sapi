@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd">
+	<sub-flow name="post-customer-data-sub-flow" doc:id="b6c04758-ee8c-4ab5-b826-a7cbded05a16" >
+		<logger level="INFO" doc:name="Start" doc:id="4513428a-e0c4-4332-960b-955095bc2bb5" />
+		<ee:transform doc:name="Transform Message" doc:id="de62992c-be54-42a7-9a49-51d42284071e" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+[{
+	address__c: payload.address,
+	firstName__c: (payload.firstNamedefault ""),
+	lastName__c: payload.lastName,
+	
+	Order__c: payload.orderId 
+}]]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<salesforce:create type="customer__c" doc:name="Create customer (customer__c)" doc:id="03a9bdc6-6056-49b1-a085-633cea7cd7ad" config-ref="Salesforce_Config"/>
+		<ee:transform doc:name="Transform Message" doc:id="398c1378-d65c-41be-b5f8-426e6148ef8c" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="End" doc:id="2832e72d-4ad4-41d3-9194-4936074e6b28" />
+	</sub-flow>
+</mule>

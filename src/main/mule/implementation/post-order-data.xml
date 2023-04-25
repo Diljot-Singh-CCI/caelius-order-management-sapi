@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="post-order-data-sub-flow" doc:id="72a71876-6d5f-410b-8ef9-f7589d07e6e7" >
+		<logger level="INFO" doc:name="Start" doc:id="912a4618-79d7-4ac3-b67c-b58bcf8b491d" />
+		<ee:transform doc:name="mapping input" doc:id="496b37b5-d51f-441b-9466-9e29c1015384" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+[{
+	poNumber__c: payload.poNumber as Number,
+	signatureRequiredFlag__c: payload.signatureRequiredFlag,
+	subTotal__c: payload.subTotal,
+	currencyCode__c: payload.currencyCode,
+	giftWrapFlag__c: payload.giftWrapFlag,
+	giftWrapMessage__c: payload.giftWrapMessage,
+	shipInstructions__c: payload.shipInstructions
+}]]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<salesforce:create doc:name="Create Order (Order__c)" doc:id="b5785eec-aaf5-473c-a45f-3910816fa90c" config-ref="Salesforce_Config" type="Order__c"/>
+		<ee:transform doc:name="payload" doc:id="e9c464b2-9dc1-4b37-aefb-ad2e59c3e851" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="orderId" ><![CDATA[%dw 2.0
+output application/java
+---
+payload.items.id]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<logger level="INFO" doc:name="End" doc:id="7fe32041-fbfe-4aae-8bbb-347f2bbb0cf3" />
+	</sub-flow>
+</mule>
